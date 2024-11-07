@@ -5,6 +5,7 @@ import hashlib
 from pswd_mngr_db_proxy import *
 
 # TODO: if __main__
+# refactor in oop style
 # розглянути повторне відкриття
 
 db_proxy = DatabaseProxy(messagebox, MAIN_TABLE)
