@@ -7,6 +7,7 @@ from pswd_mngr_db_proxy import *
 db_proxy = DatabaseProxy(messagebox, MAIN_TABLE)
 credentials_window_visibility = False
 
+
 class Root:
     def __init__(self):
         self.root = tk.Tk()
@@ -46,6 +47,7 @@ class Root:
 
             # Відкриваємо друге вікно
             Credentials(self.root)
+
 
 class Credentials:
     def __init__(self, root):
@@ -87,6 +89,7 @@ class Credentials:
         # edit_button = tk.Button(credentials_window,
         #                         text='Редагувати', pady=10, command=lambda w=credentials_window: Credential(w))
         # edit_button.pack()
+
 
 class CredentialEntity:
     def __init__(self, window, title, btn_title):
@@ -143,10 +146,18 @@ class AddCredentialEntity(CredentialEntity):
         messagebox.showinfo('Успіх', 'Користувач доданий до бази даних.')
 
 
+class EditCredentialEntity(CredentialEntity):
+    def __init__(self, window):
+        super().__init__(window, 'Редагування користувача', 'Редагувати')
+
+    def perform_db_operation(self, site, login, password):
+        db_proxy.edit_record(site, login, password)
+        messagebox.showinfo('Успіх', 'Користувач відредагований.')
+
 
 def main():
     Root()
 
+
 if __name__ == '__main__':
     main()
-
