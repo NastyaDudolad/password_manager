@@ -51,44 +51,70 @@ class Root:
 
 class Credentials:
     def __init__(self, root):
-        credentials_window = tk.Toplevel(root)
-        credentials_window.title("Логіни та паролі")
-        credentials_window.configure(bg=COLOR1)
+        self.id = 0
+
+        self.window = tk.Toplevel(root)
+        self.window.title("Логіни та паролі")
+        self.window.configure(bg=COLOR1)
 
         # Створіть Frame для Treeview і Scrollbar
-        frame = tk.Frame(credentials_window)
+        frame = tk.Frame(self.window)
         frame.pack(padx=10, pady=10, fill="both", expand=True)
 
-        tree = ttk.Treeview(frame, columns=("site", 'login', 'password'), show="headings", height=5)
-        tree.heading("site", text="Сайт")
-        tree.heading("login", text="Логін")
-        tree.heading("password", text="Пароль")
+        self.tree = ttk.Treeview(frame, columns=("site", 'login', 'password'), show="headings", height=5)
+        self.tree.heading("site", text="Сайт")
+        self.tree.heading("login", text="Логін")
+        self.tree.heading("password", text="Пароль")
 
         # Create a Scrollbar
-        scrollbar = ttk.Scrollbar(frame, orient="vertical", command=tree.yview)
-        tree.configure(yscrollcommand=scrollbar.set)
+        scrollbar = ttk.Scrollbar(frame, orient="vertical", command=self.tree.yview)
+        self.tree.configure(yscrollcommand=scrollbar.set)
         scrollbar.pack(side="right", fill="y")
 
-        data = db_proxy.get_records()
-        # Виводимо логіни та паролі
-        for j, cred in enumerate(data):
-            tree.insert("", "end", values=(cred[1], cred[2], cred[3]))
+        self.update_treeview()
 
         # Відображення Treeview
-        tree.pack(padx=10, pady=10)
+        self.tree.pack(padx=10, pady=10)
+
+        def on_select(event):
+            # Get the selected item
+            selected_item = self.tree.selection()
+            index = None
+
+            # Check if an item is selected
+            if selected_item:
+                # Get the index of the selected item
+                index = self.tree.index(selected_item[0])
+                print("Index of selected row:", index)
+            self.id = index
+
+        self.tree.bind('<<TreeviewSelect>>', on_select)
 
         # Кнопки
-        tk.Button(credentials_window, text="Закрити", command=credentials_window.destroy).pack(pady=10)
-        add_button = tk.Button(credentials_window,
+        tk.Button(self.window, text="Закрити", command=self.window.destroy).pack(pady=10)
+        add_button = tk.Button(self.window,
                                text='Додати запис',
                                pady=10,
-                               command=lambda w=credentials_window: AddCredentialEntity(w)
-                               )
+                               command=lambda: AddCredentialEntity(self))
         add_button.pack()
 
-        # edit_button = tk.Button(credentials_window,
-        #                         text='Редагувати', pady=10, command=lambda w=credentials_window: Credential(w))
-        # edit_button.pack()
+        edit_button = tk.Button(self.window,
+                                text='Редагувати',
+                                pady=10,
+                                command=lambda: EditCredentialEntity(self))
+        edit_button.pack()
+
+    def update_treeview(self):
+        # Очищаємо всі існуючі записи в Treeview
+        self.tree.delete(*self.tree.get_children())
+
+        # Отримуємо нові дані
+        data = db_proxy.get_records()
+
+        # Додаємо нові записи в Treeview
+        for j, cred in enumerate(data):
+            self.tree.insert("", "end", values=(cred[1], cred[2], cred[3]))
+
 
 
 class CredentialEntity:
@@ -138,20 +164,23 @@ class CredentialEntity:
 
 
 class AddCredentialEntity(CredentialEntity):
-    def __init__(self, window):
-        super().__init__(window, 'Додавання користувача', 'Додати')
+    def __init__(self, creds):
+        super().__init__(creds.window, 'Додавання користувача', 'Додати')
+        self.creds = creds
 
     def perform_db_operation(self, site, login, password):
         db_proxy.add_record(site, login, password)
         messagebox.showinfo('Успіх', 'Користувач доданий до бази даних.')
+        self.creds.update_treeview()
 
 
 class EditCredentialEntity(CredentialEntity):
-    def __init__(self, window):
-        super().__init__(window, 'Редагування користувача', 'Редагувати')
+    def __init__(self, creds):
+        self.id = creds.id
+        super().__init__(creds.window, f'Редаг {self.id}', 'Редагувати')
 
     def perform_db_operation(self, site, login, password):
-        db_proxy.edit_record(site, login, password)
+        db_proxy.edit_record(self.id, site, login, password)
         messagebox.showinfo('Успіх', 'Користувач відредагований.')
 
 
