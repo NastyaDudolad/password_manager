@@ -51,6 +51,8 @@ class Root:
 
 class Credentials:
     def __init__(self, root):
+        self.id = 0
+
         credentials_window = tk.Toplevel(root)
         credentials_window.title("Логіни та паролі")
         credentials_window.configure(bg=COLOR1)
@@ -77,18 +79,25 @@ class Credentials:
         # Відображення Treeview
         tree.pack(padx=10, pady=10)
 
+        def on_select(event):
+            self.id = int(tree.focus()[1:])
+
+        tree.bind('<<TreeviewSelect>>', on_select)
+
         # Кнопки
         tk.Button(credentials_window, text="Закрити", command=credentials_window.destroy).pack(pady=10)
         add_button = tk.Button(credentials_window,
                                text='Додати запис',
                                pady=10,
-                               command=lambda w=credentials_window: AddCredentialEntity(w)
+                               command=lambda: AddCredentialEntity(credentials_window)
                                )
         add_button.pack()
 
-        # edit_button = tk.Button(credentials_window,
-        #                         text='Редагувати', pady=10, command=lambda w=credentials_window: Credential(w))
-        # edit_button.pack()
+        edit_button = tk.Button(credentials_window,
+                                text='Редагувати',
+                                pady=10,
+                                command=lambda: EditCredentialEntity(credentials_window, self.id, data))
+        edit_button.pack()
 
 
 class CredentialEntity:
@@ -147,8 +156,14 @@ class AddCredentialEntity(CredentialEntity):
 
 
 class EditCredentialEntity(CredentialEntity):
-    def __init__(self, window):
+    def __init__(self, window, i, data):
         super().__init__(window, 'Редагування користувача', 'Редагувати')
+        self.id = i
+
+        if data:
+            self.site_entry.insert(0, data[0])
+            self.login_entry.insert(0, data[1])
+            self.password_entry.insert(0, data[2])
 
     def perform_db_operation(self, site, login, password):
         db_proxy.edit_record(site, login, password)
