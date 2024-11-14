@@ -179,6 +179,14 @@ class EditCredentialEntity(CredentialEntity):
         self.id = creds.id
         super().__init__(creds.window, f'Редаг {self.id}', 'Редагувати')
 
+        data = db_proxy.get_records()
+        data = data[self.id]
+
+        if data:
+            self.site_entry.insert(0, data[1])
+            self.login_entry.insert(0, data[2])
+            self.password_entry.insert(0, data[3])
+
     def perform_db_operation(self, site, login, password):
         db_proxy.edit_record(self.id, site, login, password)
         messagebox.showinfo('Успіх', 'Користувач відредагований.')
