@@ -17,26 +17,18 @@ class DatabaseProxy:
         return data
 
     def get_record(self, id):
-        self.cursor.execute(f'SELECT * FROM {self.table} WHERE id = {id}')
+        self.cursor.execute(f'SELECT rowid, id, site, login, password FROM {self.table} WHERE rowid = {id}')
         data = self.cursor.fetchall()
 
         return data
 
     def edit_record(self, id, site, login, password):
-        if site and login and password:
-            try:
-                record_to_update = (site, login, password, id)
-                self.cursor.execute(
-                    f'UPDATE {self.table} SET site=?, login=?, password=? WHERE id=?',
-                    record_to_update
-                )
-                self.connection.commit()
-
-                self.messagebox.showinfo('Успіх', 'Інформація оновлена.')
-            except ValueError:
-                self.messagebox.showerror('Помилка', 'Будь ласка, введіть правильне значення')
-        else:
-            self.messagebox.showwarning('Попередження', 'Будь ласка, заповніть всі поля.')
+        record_to_update = (site, login, password, id)
+        self.cursor.execute(
+            f'UPDATE {self.table} SET site=?, login=?, password=? WHERE rowid=?',
+            record_to_update
+        )
+        self.connection.commit()
 
     def add_record(self, site, login, password):
         self.cursor.execute(f'INSERT INTO {self.table} (site, login, password) VALUES (?, ?, ?)',

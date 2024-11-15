@@ -116,7 +116,6 @@ class Credentials:
             self.tree.insert("", "end", values=(cred[1], cred[2], cred[3]))
 
 
-
 class CredentialEntity:
     def __init__(self, window, title, btn_title):
         self.window = window
@@ -176,20 +175,21 @@ class AddCredentialEntity(CredentialEntity):
 
 class EditCredentialEntity(CredentialEntity):
     def __init__(self, creds):
-        self.id = creds.id
+        self.creds = creds
+        self.id = creds.id + 1
         super().__init__(creds.window, f'Редаг {self.id}', 'Редагувати')
 
-        data = db_proxy.get_records()
-        data = data[self.id]
+        data = db_proxy.get_record(self.id)
 
         if data:
-            self.site_entry.insert(0, data[1])
-            self.login_entry.insert(0, data[2])
-            self.password_entry.insert(0, data[3])
+            self.site_entry.insert(0, data[0][2])
+            self.login_entry.insert(0, data[0][3])
+            self.password_entry.insert(0, data[0][4])
 
     def perform_db_operation(self, site, login, password):
         db_proxy.edit_record(self.id, site, login, password)
         messagebox.showinfo('Успіх', 'Користувач відредагований.')
+        self.creds.update_treeview()
 
 
 def main():
