@@ -178,7 +178,7 @@ class EditCredentialEntity(CredentialEntity):
     def __init__(self, creds):
         self.creds = creds
         self.id = creds.id + 1
-        super().__init__(creds.window, f'Редаг {self.id}', 'Редагувати')
+        super().__init__(creds.window, f'Редагування запису {self.id}', 'Редагувати')
 
         data = db_proxy.get_record(self.id)
 
