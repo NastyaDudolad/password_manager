@@ -118,29 +118,29 @@ class Credentials:
 
 class CredentialEntity:
     def __init__(self, window, title, btn_title):
-        self.window = window
+        self.top_window = window
         self.title = title
         self.btn_title = btn_title
 
         # Створити вікно
-        add_window = tk.Toplevel(self.window)
-        add_window.title(self.title)
-        add_window.geometry("300x250")
+        self.window = tk.Toplevel(self.top_window)
+        self.window.title(self.title)
+        self.window.geometry("300x250")
 
         # Поля для введення нових даних
-        tk.Label(add_window, text="Сайт:").pack(pady=5)
-        self.site_entry = tk.Entry(add_window)
+        tk.Label(self.window, text="Сайт:").pack(pady=5)
+        self.site_entry = tk.Entry(self.window)
         self.site_entry.pack(pady=5)
 
-        tk.Label(add_window, text="Логін:").pack(pady=5)
-        self.login_entry = tk.Entry(add_window)
+        tk.Label(self.window, text="Логін:").pack(pady=5)
+        self.login_entry = tk.Entry(self.window)
         self.login_entry.pack(pady=5)
 
-        tk.Label(add_window, text="Пароль:").pack(pady=5)
-        self.password_entry = tk.Entry(add_window)
+        tk.Label(self.window, text="Пароль:").pack(pady=5)
+        self.password_entry = tk.Entry(self.window)
         self.password_entry.pack(pady=5)
 
-        tk.Button(add_window, text=self.btn_title, command=self.process_data).pack(pady=10)
+        tk.Button(self.window, text=self.btn_title, command=self.process_data).pack(pady=10)
 
     # TODO: change the return type
     def perform_db_operation(self, site, login, password):
@@ -171,6 +171,7 @@ class AddCredentialEntity(CredentialEntity):
         db_proxy.add_record(site, login, password)
         messagebox.showinfo('Успіх', 'Користувач доданий до бази даних.')
         self.creds.update_treeview()
+        self.window.destroy()
 
 
 class EditCredentialEntity(CredentialEntity):
@@ -190,6 +191,7 @@ class EditCredentialEntity(CredentialEntity):
         db_proxy.edit_record(self.id, site, login, password)
         messagebox.showinfo('Успіх', 'Користувач відредагований.')
         self.creds.update_treeview()
+        self.window.destroy()
 
 
 def main():
