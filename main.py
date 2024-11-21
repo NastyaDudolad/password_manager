@@ -103,6 +103,11 @@ class Credentials:
                                 pady=10,
                                 command=lambda: EditCredentialEntity(self))
         edit_button.pack()
+        delete_button = tk.Button(self.window,
+                                  text='Видалити',
+                                  pady=10,
+                                  command=lambda: DeleteCredentialEntity(self))
+        delete_button.pack()
 
     def update_treeview(self):
         # Очищаємо всі існуючі записи в Treeview
@@ -192,6 +197,15 @@ class EditCredentialEntity(CredentialEntity):
         messagebox.showinfo('Успіх', 'Користувач відредагований.')
         self.creds.update_treeview()
         self.window.destroy()
+
+
+class DeleteCredentialEntity:
+    def __init__(self, creds):
+        self.creds = creds
+        if messagebox.askyesno('delete', 'Ви впевнені що хочете видалити запис?'):
+            db_proxy.delete_record(creds.id + 1)
+            messagebox.showinfo('Успіх', 'Запис видалено.')
+            creds.update_treeview()
 
 
 def main():
