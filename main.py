@@ -52,6 +52,7 @@ class Root:
 class Credentials:
     def __init__(self, root):
         self.id = 0
+        self.data = []
 
         self.window = tk.Toplevel(root)
         self.window.title("Логіни та паролі")
@@ -86,7 +87,7 @@ class Credentials:
                 # Get the index of the selected item
                 index = self.tree.index(selected_item[0])
                 print("Index of selected row:", index)
-            self.id = index
+            self.id = self.data[index][0]
 
         self.tree.bind('<<TreeviewSelect>>', on_select)
 
@@ -114,10 +115,10 @@ class Credentials:
         self.tree.delete(*self.tree.get_children())
 
         # Отримуємо нові дані
-        data = db_proxy.get_records()
+        self.data = db_proxy.get_records()
 
         # Додаємо нові записи в Treeview
-        for j, cred in enumerate(data):
+        for j, cred in enumerate(self.data):
             self.tree.insert("", "end", values=(cred[1], cred[2], cred[3]))
 
 
@@ -182,15 +183,15 @@ class AddCredentialEntity(CredentialEntity):
 class EditCredentialEntity(CredentialEntity):
     def __init__(self, creds):
         self.creds = creds
-        self.id = creds.id + 1
+        self.id = creds.id
         super().__init__(creds.window, f'Редагування запису {self.id}', 'Редагувати')
 
         data = db_proxy.get_record(self.id)
 
         if data:
-            self.site_entry.insert(0, data[0][2])
-            self.login_entry.insert(0, data[0][3])
-            self.password_entry.insert(0, data[0][4])
+            self.site_entry.insert(0, data[0][1])
+            self.login_entry.insert(0, data[0][2])
+            self.password_entry.insert(0, data[0][3])
 
     def perform_db_operation(self, site, login, password):
         db_proxy.edit_record(self.id, site, login, password)
@@ -203,7 +204,7 @@ class DeleteCredentialEntity:
     def __init__(self, creds):
         self.creds = creds
         if messagebox.askyesno('delete', 'Ви впевнені що хочете видалити запис?'):
-            db_proxy.delete_record(creds.id + 1)
+            db_proxy.delete_record(creds.id)
             messagebox.showinfo('Успіх', 'Запис видалено.')
             creds.update_treeview()
 

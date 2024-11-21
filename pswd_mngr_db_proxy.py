@@ -17,7 +17,7 @@ class DatabaseProxy:
         return data
 
     def get_record(self, id):
-        self.cursor.execute(f'SELECT rowid, id, site, login, password FROM {self.table} WHERE rowid = {id}')
+        self.cursor.execute(f'SELECT id, site, login, password FROM {self.table} WHERE id = {id}')
         data = self.cursor.fetchall()
 
         return data
@@ -25,7 +25,7 @@ class DatabaseProxy:
     def edit_record(self, id, site, login, password):
         record_to_update = (site, login, password, id)
         self.cursor.execute(
-            f'UPDATE {self.table} SET site=?, login=?, password=? WHERE rowid=?',
+            f'UPDATE {self.table} SET site=?, login=?, password=? WHERE id=?',
             record_to_update
         )
         self.connection.commit()
