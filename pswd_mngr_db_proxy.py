@@ -36,5 +36,5 @@ class DatabaseProxy:
         self.connection.commit()
 
     def delete_record(self, id):
-        self.cursor.execute(f'DELETE FROM {self.table} WHERE id=' + str(id))
+        self.cursor.execute(f'DELETE FROM {self.table} WHERE rowid=' + str(id))
         self.connection.commit()

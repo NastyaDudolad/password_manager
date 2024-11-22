@@ -5,11 +5,12 @@ import hashlib
 from pswd_mngr_db_proxy import *
 
 db_proxy = DatabaseProxy(messagebox, MAIN_TABLE)
-credentials_window_visibility = False
 
 
 class Root:
     def __init__(self):
+        self.credentials_entity = None
+
         self.root = tk.Tk()
         self.root.title("Менеджер паролів")
         self.root.geometry("400x300")  # Розмір вікна
@@ -34,27 +35,30 @@ class Root:
 
     # Функція для перевірки пароля
     def check_password(self):
-        global credentials_window_visibility
-        if not credentials_window_visibility:
-            credentials_window_visibility = True
-            entry_password = self.entry.get()  # Отримуємо введений пароль
+        entry_password = self.entry.get()  # Отримуємо введений пароль
 
-            # Порівнюємо хеші введеного пароля та збереженого
-            # if hashlib.md5(entry_password.encode('utf-8')).digest() == PASSWORD_HASH:
-            #     open_credentials_window()  # Відкриваємо друге вікно
-            # else:
-            #     messagebox.showerror('Помилка', 'Неправильний пароль')
+        # Порівнюємо хеші введеного пароля та збереженого
+        # if hashlib.md5(entry_password.encode('utf-8')).digest() == PASSWORD_HASH:
+        #     open_credentials_window()  # Відкриваємо друге вікно
+        # else:
+        #     messagebox.showerror('Помилка', 'Неправильний пароль')
 
-            # Відкриваємо друге вікно
-            Credentials(self.root)
+        # Відкриваємо друге вікно
+        if not self.credentials_entity:
+            self.credentials_entity = Credentials(self.root)
+        else:
+            if not self.credentials_entity.credentials_window_visibility:
+                self.credentials_entity.show_credentials_window()
 
 
 class Credentials:
     def __init__(self, root):
         self.id = 0
         self.data = []
+        self.credentials_window_visibility = False
 
         self.window = tk.Toplevel(root)
+        self.credentials_window_visibility = True
         self.window.title("Логіни та паролі")
         self.window.configure(bg=COLOR1)
 
@@ -92,7 +96,7 @@ class Credentials:
         self.tree.bind('<<TreeviewSelect>>', on_select)
 
         # Кнопки
-        tk.Button(self.window, text="Закрити", command=self.window.destroy).pack(pady=10)
+        tk.Button(self.window, text="Закрити", command=self.close_credentials_window).pack(pady=10)
         add_button = tk.Button(self.window,
                                text='Додати запис',
                                pady=10,
@@ -109,6 +113,14 @@ class Credentials:
                                   pady=10,
                                   command=lambda: DeleteCredentialEntity(self))
         delete_button.pack()
+
+    def show_credentials_window(self):
+        self.window.deiconify()
+        self.credentials_window_visibility = True
+
+    def close_credentials_window(self):
+        self.window.withdraw()
+        self.credentials_window_visibility = False
 
     def update_treeview(self):
         # Очищаємо всі існуючі записи в Treeview
