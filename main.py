@@ -95,24 +95,21 @@ class Credentials:
 
         self.tree.bind('<<TreeviewSelect>>', on_select)
 
-        # Кнопки
-        tk.Button(self.window, text="Закрити", command=self.close_credentials_window).pack(pady=10)
-        add_button = tk.Button(self.window,
-                               text='Додати запис',
-                               pady=10,
-                               command=lambda: AddCredentialEntity(self))
-        add_button.pack()
+        button_frame = tk.Frame(self.window, bg=COLOR1)
+        button_frame.pack(pady=10)
 
-        edit_button = tk.Button(self.window,
-                                text='Редагувати',
-                                pady=10,
-                                command=lambda: EditCredentialEntity(self))
-        edit_button.pack()
-        delete_button = tk.Button(self.window,
-                                  text='Видалити',
-                                  pady=10,
-                                  command=lambda: DeleteCredentialEntity(self))
-        delete_button.pack()
+        # Кнопки
+        close_button = tk.Button(button_frame, text="Закрити", command=self.close_credentials_window, width=15)
+        close_button.grid(row=0, column=0, padx=5)
+
+        add_button = tk.Button(button_frame, text='Додати запис', command=lambda: AddCredentialEntity(self), width=15)
+        add_button.grid(row=0, column=1, padx=5)
+
+        edit_button = tk.Button(button_frame, text='Редагувати', command=lambda: EditCredentialEntity(self), width=15)
+        edit_button.grid(row=0, column=2, padx=5)
+
+        delete_button = tk.Button(button_frame, text='Видалити', command=lambda: DeleteCredentialEntity(self), width=15)
+        delete_button.grid(row=0, column=3, padx=5)
 
     def show_credentials_window(self):
         self.window.deiconify()
