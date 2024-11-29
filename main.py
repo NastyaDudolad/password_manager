@@ -38,17 +38,17 @@ class Root:
         entry_password = self.entry.get()  # Отримуємо введений пароль
 
         # Порівнюємо хеші введеного пароля та збереженого
-        # if hashlib.md5(entry_password.encode('utf-8')).digest() == PASSWORD_HASH:
-        #     open_credentials_window()  # Відкриваємо друге вікно
-        # else:
-        #     messagebox.showerror('Помилка', 'Неправильний пароль')
-
-        # Відкриваємо друге вікно
-        if not self.credentials_entity:
-            self.credentials_entity = Credentials(self.root)
+        if hashlib.md5(entry_password.encode()).hexdigest() == PASSWORD_HASH:
+            if not self.credentials_entity:
+                self.credentials_entity = Credentials(self.root)
+            else:
+                if not self.credentials_entity.credentials_window_visibility:
+                    self.credentials_entity.show_credentials_window()
         else:
-            if not self.credentials_entity.credentials_window_visibility:
-                self.credentials_entity.show_credentials_window()
+            messagebox.showerror('Помилка', 'Неправильний пароль')
+
+
+
 
 
 class Credentials:
